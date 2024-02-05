@@ -1,3 +1,4 @@
+import { url } from "inspector";
 import { title } from "process";
 import React, { useState } from "react";
 import styled from "styled-components";
@@ -51,18 +52,7 @@ function Form({ addCard }: FormProps): JSX.Element {
     //const [cards, setCards] = useState<Array<ICard>>(arrayCard)
 
     function createCard() {
-        if (!isValidTitle(titolo)) {
-            alert("Inserire un titolo!");
-            return;
-        }
-        if (!isValidDescription(descrizione)) {
-            alert("Inserire una descrizione!");
-            return;
-        }
-        if (!isValidUrl(immagine)) {
-            alert("Inserire un URL dell'immagine valido!");
-            return;
-          }
+        
         const newCard = {
             id: Math.floor(Math.random() * 1000000),
             title: titolo,
@@ -84,13 +74,15 @@ function Form({ addCard }: FormProps): JSX.Element {
         return description.trim() !== ""; 
       }
 
-    function isValidUrl(url: string) {
-        const urlPattern = new RegExp(
-          /^(https?:\/\/)?([\w.]+)\.([a-z]{2,})(\/?\w*\/?)*(\?.*)?$/i
-        );
-        return urlPattern.test(url);
-      }
-
+      const isValidUrl = (url: string): boolean => {
+        try {
+          new URL(url);
+          return true;
+        } catch (error) {
+          return false;
+        }
+      };
+      const isButtonDisabled = !isValidDescription(descrizione) || !isValidTitle(titolo) || !isValidUrl(immagine);
 
     return (
         <FormContainer>
@@ -104,7 +96,7 @@ function Form({ addCard }: FormProps): JSX.Element {
                 <input type="text" placeholder="Inserisci Url dell'immagine" value={immagine} onChange={(e) => { setImmagine(e.target.value) }}></input>
             </CampiForm>
             <DivButton>
-                <ButtonCrea onClick={createCard} disabled={!isValidUrl(immagine) || !isValidTitle(titolo) || !isValidDescription(descrizione)}>Crea card</ButtonCrea>
+                <ButtonCrea onClick={createCard} disabled={ isButtonDisabled }>Crea card</ButtonCrea>
             </DivButton>
         </FormContainer>
     )
